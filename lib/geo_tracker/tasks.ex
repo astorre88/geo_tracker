@@ -56,20 +56,40 @@ defmodule GeoTracker.Tasks do
   end
 
   @doc """
-  Updates a task.
+  Picks a task.
 
   ## Examples
 
-      iex> update_task(task, %{field: new_value})
+      iex> pick_task(123)
       {:ok, %Task{}}
 
-      iex> update_task(task, %{field: bad_value})
+      iex> pick_task(456)
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_task(%Task{} = task, attrs) do
-    task
-    |> Task.changeset(attrs)
+  def pick_task(id) do
+    id
+    |> get_task!()
+    |> Task.changeset(%{state: :assigned})
+    |> Repo.update()
+  end
+
+  @doc """
+  Finishes a task.
+
+  ## Examples
+
+      iex> finish_task(123)
+      {:ok, %Task{}}
+
+      iex> finish_task(456)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def finish_task(id) do
+    id
+    |> get_task!()
+    |> Task.changeset(%{state: :done})
     |> Repo.update()
   end
 end

@@ -9,6 +9,11 @@ defmodule GeoTrackerWeb.Router do
     pipe_through :api
 
     scope "/v1" do
+      scope "/tasks" do
+        resources("/", TaskController, only: [:index, :create])
+        patch("/:id/pick", TaskController, :pick)
+        patch("/:id/finish", TaskController, :finish)
+      end
     end
   end
 

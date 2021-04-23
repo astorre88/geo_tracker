@@ -9,7 +9,7 @@ defmodule GeoTracker.Tasks.Task do
   alias GeoTracker.StateEnum
 
   schema "tasks" do
-    field :state, StateEnum, default: 0
+    field :state, StateEnum, read_after_writes: true
     field :pickup, Geo.PostGIS.Geometry
     field :delivery, Geo.PostGIS.Geometry
 

@@ -13,11 +13,6 @@ defmodule GeoTracker.TasksTest do
       pickup: Point.from_coordinates(55.817566, 37.491528),
       delivery: Point.from_coordinates(55.746081, 37.487730)
     }
-    @update_attrs %{
-      state: :assigned,
-      pickup: Point.from_coordinates(55.746081, 37.487730),
-      delivery: Point.from_coordinates(55.817566, 37.491528)
-    }
     @invalid_attrs %{pickup: nil, delivery: nil}
 
     test "list_tasks/0 returns all tasks" do
@@ -33,7 +28,7 @@ defmodule GeoTracker.TasksTest do
     test "create_task/1 with valid data creates a task" do
       assert {:ok,
               %Task{
-                state: 0,
+                state: :new,
                 pickup: %Geo.Point{coordinates: {55.817566, 37.491528}},
                 delivery: %Geo.Point{coordinates: {55.746081, 37.487730}}
               }} = Tasks.create_task(@valid_attrs)
@@ -44,21 +39,16 @@ defmodule GeoTracker.TasksTest do
       assert errors_on(changeset) == %{delivery: ["can't be blank"], pickup: ["can't be blank"]}
     end
 
-    test "update_task/2 with valid data updates the task" do
-      task = insert(:task)
+    test "pick_task/2 picks the task" do
+      %Task{id: id} = insert(:task)
 
-      assert {:ok,
-              %Task{
-                state: :assigned,
-                pickup: %Geo.Point{coordinates: {55.746081, 37.487730}},
-                delivery: %Geo.Point{coordinates: {55.817566, 37.491528}}
-              }} = Tasks.update_task(task, @update_attrs)
+      assert {:ok, %Task{state: :assigned}} = Tasks.pick_task(id)
     end
 
-    test "update_task/2 with invalid data returns error changeset" do
-      task = insert(:task)
-      assert {:error, %Ecto.Changeset{} = changeset} = Tasks.update_task(task, @invalid_attrs)
-      assert errors_on(changeset) == %{delivery: ["can't be blank"], pickup: ["can't be blank"]}
+    test "finish_task/2 finishes the task" do
+      %Task{id: id} = insert(:task)
+
+      assert {:ok, %Task{state: :done}} = Tasks.finish_task(id)
     end
   end
 end
