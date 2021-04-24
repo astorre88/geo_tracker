@@ -4,7 +4,15 @@ defmodule GeoTrackerWeb.TaskView do
   alias GeoTrackerWeb.TaskView
 
   def render("index.json", %{tasks: tasks}) do
-    %{data: render_many(tasks, TaskView, "task.json")}
+    %{
+      data: render_many(tasks, TaskView, "task.json"),
+      pagination: %{
+        page_number: tasks.page_number,
+        page_size: tasks.page_size,
+        total_pages: tasks.total_pages,
+        total_entries: tasks.total_entries
+      }
+    }
   end
 
   def render("show.json", %{task: task}) do

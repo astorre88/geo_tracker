@@ -26,7 +26,8 @@ defmodule GeoTracker.TasksTest do
       task4 = insert(:task, pickup: Point.from_coordinates(59.325000, 18.070897))
 
       # Voikovskaja
-      assert Tasks.list_tasks(%{"lat" => 55.817566, "lon" => 37.491528}) == {:ok, [task2, task3, task1, task4]}
+      assert {:ok, %Scrivener.Page{entries: [^task2, ^task3, ^task1, ^task4]}} =
+               Tasks.list_tasks(%{"lat" => 55.817566, "lon" => 37.491528})
     end
 
     test "list_tasks/1 successfully manages string values" do
@@ -38,7 +39,8 @@ defmodule GeoTracker.TasksTest do
       task3 = insert(:task, pickup: Point.from_coordinates(55.801120, 37.671149))
 
       # Voikovskaja
-      assert Tasks.list_tasks(%{"lat" => "55.817566", "lon" => "37.491528"}) == {:ok, [task2, task3, task1]}
+      assert {:ok, %Scrivener.Page{entries: [^task2, ^task3, ^task1]}} =
+               Tasks.list_tasks(%{"lat" => "55.817566", "lon" => "37.491528"})
     end
 
     test "get_task!/1 returns the task with given id" do

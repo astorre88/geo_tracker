@@ -22,13 +22,13 @@ defmodule GeoTracker.Tasks do
       {:error, :bad_request}
 
   """
-  def list_tasks(%{"lat" => lat, "lon" => lon}) do
+  def list_tasks(%{"lat" => lat, "lon" => lon} = params) do
     with {:ok, parsed_lat} <- parse_from(lat),
          {:ok, parsed_lon} <- parse_from(lon) do
       {:ok,
        Task
        |> TaskQuery.by_distance(Point.from_coordinates(parsed_lat, parsed_lon))
-       |> Repo.all()}
+       |> Repo.paginate(params)}
     end
   end
 

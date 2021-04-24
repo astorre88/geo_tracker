@@ -45,7 +45,8 @@ defmodule GeoTracker.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:ecto_enum, "~> 1.4"},
       {:geo_postgis, "~> 3.4"},
-      {:ex_machina, "~> 2.7.0", only: :test}
+      {:ex_machina, "~> 2.7.0", only: :test},
+      {:scrivener_ecto, "~> 2.0"}
     ]
   end
 

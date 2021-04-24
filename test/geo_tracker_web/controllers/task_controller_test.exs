@@ -17,9 +17,22 @@ defmodule GeoTrackerWeb.TaskControllerTest do
   end
 
   describe "index" do
-    test "lists all tasks", %{conn: conn} do
-      conn = get(conn, Routes.task_path(conn, :index), lat: 55.817566, lon: 37.491528)
-      assert json_response(conn, 200)["data"] == []
+    test "lists all tasks ordered by coordinates with pagination", %{conn: conn} do
+      # Kuzminki
+      %Task{id: task1_id} = insert(:task, pickup: Point.from_coordinates(55.688011, 37.784089))
+      # Fili
+      insert(:task, pickup: Point.from_coordinates(55.749107, 37.491456))
+      # Sokolniki
+      insert(:task, pickup: Point.from_coordinates(55.801120, 37.671149))
+      # Stockholm
+      %Task{id: task4_id} = insert(:task, pickup: Point.from_coordinates(59.325000, 18.070897))
+
+      conn = get(conn, Routes.task_path(conn, :index), lat: 55.817566, lon: 37.491528, page: 2, page_size: 2)
+
+      assert %{
+               "data" => [%{"id" => ^task1_id}, %{"id" => ^task4_id}],
+               "pagination" => %{"page_number" => 2, "page_size" => 2, "total_pages" => 2, "total_entries" => 4}
+             } = json_response(conn, 200)
     end
 
     test "returns :bad_request with nonvalid params", %{conn: conn} do
