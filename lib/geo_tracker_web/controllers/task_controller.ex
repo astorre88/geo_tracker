@@ -6,9 +6,10 @@ defmodule GeoTrackerWeb.TaskController do
 
   action_fallback GeoTrackerWeb.FallbackController
 
-  def index(conn, _params) do
-    tasks = Tasks.list_tasks()
-    render(conn, "index.json", tasks: tasks)
+  def index(conn, params) do
+    with {:ok, tasks} <- Tasks.list_tasks(params) do
+      render(conn, "index.json", tasks: tasks)
+    end
   end
 
   def create(conn, %{"task" => task_params}) do

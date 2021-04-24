@@ -18,8 +18,13 @@ defmodule GeoTrackerWeb.TaskControllerTest do
 
   describe "index" do
     test "lists all tasks", %{conn: conn} do
-      conn = get(conn, Routes.task_path(conn, :index))
+      conn = get(conn, Routes.task_path(conn, :index), lat: 55.817566, lon: 37.491528)
       assert json_response(conn, 200)["data"] == []
+    end
+
+    test "returns :bad_request with nonvalid params", %{conn: conn} do
+      conn = get(conn, Routes.task_path(conn, :index), lat: "abc", lon: "xyz")
+      assert json_response(conn, 400)["errors"] == %{"detail" => "Bad Request"}
     end
   end
 

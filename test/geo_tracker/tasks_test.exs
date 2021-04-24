@@ -15,9 +15,30 @@ defmodule GeoTracker.TasksTest do
     }
     @invalid_attrs %{pickup: nil, delivery: nil}
 
-    test "list_tasks/0 returns all tasks" do
-      task = insert(:task)
-      assert Tasks.list_tasks() == [task]
+    test "list_tasks/1 returns ordered by distance tasks" do
+      # Kuzminki
+      task1 = insert(:task, pickup: Point.from_coordinates(55.688011, 37.784089))
+      # Fili
+      task2 = insert(:task, pickup: Point.from_coordinates(55.749107, 37.491456))
+      # Sokolniki
+      task3 = insert(:task, pickup: Point.from_coordinates(55.801120, 37.671149))
+      # Stockholm
+      task4 = insert(:task, pickup: Point.from_coordinates(59.325000, 18.070897))
+
+      # Voikovskaja
+      assert Tasks.list_tasks(%{"lat" => 55.817566, "lon" => 37.491528}) == {:ok, [task2, task3, task1, task4]}
+    end
+
+    test "list_tasks/1 successfully manages string values" do
+      # Kuzminki
+      task1 = insert(:task, pickup: Point.from_coordinates(55.688011, 37.784089))
+      # Fili
+      task2 = insert(:task, pickup: Point.from_coordinates(55.749107, 37.491456))
+      # Sokolniki
+      task3 = insert(:task, pickup: Point.from_coordinates(55.801120, 37.671149))
+
+      # Voikovskaja
+      assert Tasks.list_tasks(%{"lat" => "55.817566", "lon" => "37.491528"}) == {:ok, [task2, task3, task1]}
     end
 
     test "get_task!/1 returns the task with given id" do
