@@ -10,10 +10,12 @@ defmodule GeoTracker.TasksTest do
     alias GeoTracker.Tasks.Task
 
     @valid_attrs %{
-      pickup: Point.from_coordinates(55.817566, 37.491528),
-      delivery: Point.from_coordinates(55.746081, 37.487730)
+      lat1: 55.817566,
+      long1: 37.491528,
+      lat2: 55.746081,
+      long2: 37.487730
     }
-    @invalid_attrs %{pickup: nil, delivery: nil}
+    @invalid_attrs %{lat1: nil, long1: nil, lat2: nil, long2: nil}
 
     test "list_tasks/1 returns ordered by distance tasks" do
       # Kuzminki
@@ -27,7 +29,7 @@ defmodule GeoTracker.TasksTest do
 
       # Voikovskaja
       assert {:ok, %Scrivener.Page{entries: [^task2, ^task3, ^task1, ^task4]}} =
-               Tasks.list_tasks(%{"lat" => 55.817566, "lon" => 37.491528})
+               Tasks.list_tasks(%{"lat" => 55.817566, "long" => 37.491528})
     end
 
     test "list_tasks/1 successfully manages string values" do
@@ -40,7 +42,7 @@ defmodule GeoTracker.TasksTest do
 
       # Voikovskaja
       assert {:ok, %Scrivener.Page{entries: [^task2, ^task3, ^task1]}} =
-               Tasks.list_tasks(%{"lat" => "55.817566", "lon" => "37.491528"})
+               Tasks.list_tasks(%{"lat" => "55.817566", "long" => "37.491528"})
     end
 
     test "get_task!/1 returns the task with given id" do
@@ -59,7 +61,13 @@ defmodule GeoTracker.TasksTest do
 
     test "create_task/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{} = changeset} = Tasks.create_task(@invalid_attrs)
-      assert errors_on(changeset) == %{delivery: ["can't be blank"], pickup: ["can't be blank"]}
+
+      assert errors_on(changeset) == %{
+               lat1: ["can't be blank"],
+               lat2: ["can't be blank"],
+               long1: ["can't be blank"],
+               long2: ["can't be blank"]
+             }
     end
 
     test "pick_task/2 picks the task" do

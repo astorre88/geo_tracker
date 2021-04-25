@@ -22,12 +22,12 @@ defmodule GeoTracker.Tasks do
       {:error, :bad_request}
 
   """
-  def list_tasks(%{"lat" => lat, "lon" => lon} = params) do
+  def list_tasks(%{"lat" => lat, "long" => long} = params) do
     with {:ok, parsed_lat} <- parse_from(lat),
-         {:ok, parsed_lon} <- parse_from(lon) do
+         {:ok, parsed_long} <- parse_from(long) do
       {:ok,
        Task
-       |> TaskQuery.by_distance(Point.from_coordinates(parsed_lat, parsed_lon))
+       |> TaskQuery.by_distance(Point.from_coordinates(parsed_lat, parsed_long))
        |> Repo.paginate(params)}
     end
   end
@@ -91,7 +91,7 @@ defmodule GeoTracker.Tasks do
   def pick_task(id) do
     id
     |> get_task!()
-    |> Task.changeset(%{state: :assigned})
+    |> Task.update_changeset(%{state: :assigned})
     |> Repo.update()
   end
 
@@ -110,7 +110,7 @@ defmodule GeoTracker.Tasks do
   def finish_task(id) do
     id
     |> get_task!()
-    |> Task.changeset(%{state: :done})
+    |> Task.update_changeset(%{state: :done})
     |> Repo.update()
   end
 end

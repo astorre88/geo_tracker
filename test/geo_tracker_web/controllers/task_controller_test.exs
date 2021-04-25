@@ -7,10 +7,12 @@ defmodule GeoTrackerWeb.TaskControllerTest do
   alias GeoTracker.Tasks.Task
 
   @create_attrs %{
-    pickup: Point.from_coordinates(55.817566, 37.491528),
-    delivery: Point.from_coordinates(55.746081, 37.487730)
+    lat1: 55.817566,
+    long1: 37.491528,
+    lat2: 55.746081,
+    long2: 37.487730
   }
-  @invalid_attrs %{pickup: nil, delivery: nil}
+  @invalid_attrs %{lat1: nil, long1: nil, lat2: nil, long2: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -27,7 +29,7 @@ defmodule GeoTrackerWeb.TaskControllerTest do
       # Stockholm
       %Task{id: task4_id} = insert(:task, pickup: Point.from_coordinates(59.325000, 18.070897))
 
-      conn = get(conn, Routes.task_path(conn, :index), lat: 55.817566, lon: 37.491528, page: 2, page_size: 2)
+      conn = get(conn, Routes.task_path(conn, :index), lat: 55.817566, long: 37.491528, page: 2, page_size: 2)
 
       assert %{
                "data" => [%{"id" => ^task1_id}, %{"id" => ^task4_id}],
@@ -36,7 +38,7 @@ defmodule GeoTrackerWeb.TaskControllerTest do
     end
 
     test "returns :bad_request with nonvalid params", %{conn: conn} do
-      conn = get(conn, Routes.task_path(conn, :index), lat: "abc", lon: "xyz")
+      conn = get(conn, Routes.task_path(conn, :index), lat: "abc", long: "xyz")
       assert json_response(conn, 400)["errors"] == %{"detail" => "Bad Request"}
     end
   end
