@@ -32,6 +32,8 @@ defmodule GeoTracker.Tasks do
     end
   end
 
+  def list_tasks(_), do: {:error, :bad_request}
+
   defp parse_from(value) when is_binary(value) do
     case Float.parse(value) do
       {parsed, _} -> {:ok, parsed}
