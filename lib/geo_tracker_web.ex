@@ -23,6 +23,7 @@ defmodule GeoTrackerWeb do
 
       import Plug.Conn
       import GeoTrackerWeb.Gettext
+      import GeoTracker.Auth, only: [driver: 2, manager: 2]
       alias GeoTrackerWeb.Router.Helpers, as: Routes
     end
   end

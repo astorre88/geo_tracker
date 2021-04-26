@@ -6,6 +6,9 @@ defmodule GeoTrackerWeb.TaskController do
 
   action_fallback GeoTrackerWeb.FallbackController
 
+  plug :manager when action in ~w(create)a
+  plug :driver when action in ~w(index pick finish)a
+
   def index(conn, params) do
     with {:ok, tasks} <- Tasks.list_tasks(params) do
       render(conn, "index.json", tasks: tasks)

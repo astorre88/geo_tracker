@@ -3,6 +3,7 @@ defmodule GeoTrackerWeb.TaskControllerTest do
 
   import GeoTracker.Factory
 
+  alias GeoTracker.Accounts.Token
   alias GeoTracker.Geo.Point
   alias GeoTracker.Tasks.Task
 
@@ -19,7 +20,13 @@ defmodule GeoTrackerWeb.TaskControllerTest do
   end
 
   describe "index" do
-    test "lists all tasks ordered by coordinates with pagination", %{conn: conn} do
+    setup %{conn: conn} do
+      %Token{value: driver_token_value} = insert(:token, role: :driver)
+
+      {:ok, conn: put_req_header(conn, "authorization", "Bearer #{driver_token_value}")}
+    end
+
+    test "lists all tasks ordered by coordinates with pagination for driver", %{conn: conn} do
       # Kuzminki
       %Task{id: task1_id} = insert(:task, pickup: Point.from_coordinates(55.688011, 37.784089))
       # Fili
@@ -44,6 +51,12 @@ defmodule GeoTrackerWeb.TaskControllerTest do
   end
 
   describe "create task" do
+    setup %{conn: conn} do
+      %Token{value: manager_token_value} = insert(:token, role: :manager)
+
+      {:ok, conn: put_req_header(conn, "authorization", "Bearer #{manager_token_value}")}
+    end
+
     test "renders task when data is valid", %{conn: conn} do
       conn = post(conn, Routes.task_path(conn, :create), task: @create_attrs)
 
@@ -55,6 +68,17 @@ defmodule GeoTrackerWeb.TaskControllerTest do
              } = json_response(conn, 201)["data"]
     end
 
+    test "driver can't create a task", %{conn: conn} do
+      %Token{value: driver_token_value} = insert(:token, role: :driver)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{driver_token_value}")
+        |> post(Routes.task_path(conn, :create), task: @invalid_attrs)
+
+      assert json_response(conn, 401)["errors"] == %{"detail" => "Unauthorized"}
+    end
+
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.task_path(conn, :create), task: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
@@ -62,8 +86,10 @@ defmodule GeoTrackerWeb.TaskControllerTest do
   end
 
   describe "update task" do
-    setup do
-      %{task: insert(:task)}
+    setup %{conn: conn} do
+      %Token{value: driver_token_value} = insert(:token, role: :driver)
+
+      {:ok, conn: put_req_header(conn, "authorization", "Bearer #{driver_token_value}"), task: insert(:task)}
     end
 
     test "successfully picks a task", %{conn: conn, task: %Task{id: id} = task} do
@@ -74,6 +100,28 @@ defmodule GeoTrackerWeb.TaskControllerTest do
     test "successfully finishes a task", %{conn: conn, task: %Task{id: id} = task} do
       conn = patch(conn, Routes.task_path(conn, :finish, task))
       assert %{"id" => ^id, "state" => "done"} = json_response(conn, 200)["data"]
+    end
+
+    test "manager can't pick a task", %{conn: conn, task: task} do
+      %Token{value: manager_token_value} = insert(:token, role: :manager)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{manager_token_value}")
+        |> patch(Routes.task_path(conn, :pick, task))
+
+      assert json_response(conn, 401)["errors"] == %{"detail" => "Unauthorized"}
+    end
+
+    test "manager can't finish a task", %{conn: conn, task: task} do
+      %Token{value: manager_token_value} = insert(:token, role: :manager)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{manager_token_value}")
+        |> patch(Routes.task_path(conn, :finish, task))
+
+      assert json_response(conn, 401)["errors"] == %{"detail" => "Unauthorized"}
     end
   end
 end

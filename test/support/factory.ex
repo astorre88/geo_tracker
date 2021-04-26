@@ -1,12 +1,13 @@
 defmodule GeoTracker.Factory do
   use ExMachina.Ecto, repo: GeoTracker.Repo
 
-  alias GeoTracker.Accounts.User
+  alias GeoTracker.Auth
+  alias GeoTracker.Accounts.Token
   alias GeoTracker.Geo.Point
   alias GeoTracker.Tasks.Task
 
-  def user_factory do
-    %User{}
+  def token_factory do
+    %Token{value: Auth.generate_token()}
   end
 
   def task_factory do
