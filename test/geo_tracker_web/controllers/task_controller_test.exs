@@ -63,8 +63,10 @@ defmodule GeoTrackerWeb.TaskControllerTest do
       assert %{
                "id" => _,
                "state" => "new",
-               "pickup" => %{"coordinates" => [55.817566, 37.491528]},
-               "delivery" => %{"coordinates" => [55.746081, 37.48773]}
+               "lat1" => 55.817566,
+               "lat2" => 55.746081,
+               "long1" => 37.491528,
+               "long2" => 37.48773
              } = json_response(conn, 201)["data"]
     end
 
